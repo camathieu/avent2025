@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Calendrier de l'Avent – Devinettes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top, #0f3d2e 0, #1a1a2e 45%, #0a0f1e 100%);
+      --card-bg: rgba(25, 45, 35, 0.92);
+      --accent: #ffd700;
+      --accent-soft: rgba(255, 215, 0, 0.15);
+      --accent-red: #c41e3a;
+      --accent-green: #2d5f3f;
+      --text-main: #f0f4f0;
+      --text-muted: #b8c5b8;
+      --border-soft: rgba(184, 197, 184, 0.25);
+      --danger: #e63946;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background: var(--bg-gradient);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,0.7) 0, transparent 50%),
+        radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.5) 0, transparent 50%),
+        radial-gradient(2px 2px at 30% 70%, rgba(255,255,255,0.6) 0, transparent 50%),
+        radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.5) 0, transparent 50%),
+        radial-gradient(3px 3px at 45% 35%, rgba(255,255,255,0.8) 0, transparent 50%),
+        radial-gradient(2px 2px at 65% 55%, rgba(255,255,255,0.6) 0, transparent 50%);
+      opacity: 0.6;
+      z-index: 0;
+      animation: snowfall 20s linear infinite;
+    }
+
+    @keyframes snowfall {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 960px;
+      margin: 24px;
+      padding: 24px 20px 28px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(25,45,35,0.96), rgba(25,45,35,0.92));
+      border: 2px solid;
+      border-image: linear-gradient(135deg, #ffd700, #c41e3a, #2d5f3f, #ffd700) 1;
+      box-shadow:
+        0 32px 80px rgba(15, 23, 42, 0.85),
+        0 0 20px rgba(255, 215, 0, 0.2),
+        inset 0 1px 0 rgba(255, 215, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffd700, #ffed4e, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    }
+
+    h1::before {
+      content: "🎄 ";
+      -webkit-text-fill-color: initial;
+    }
+
+    h1::after {
+      content: " 🎅";
+      -webkit-text-fill-color: initial;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 480px;
+    }
+
+    .today-pill {
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.2), rgba(45, 95, 63, 0.2));
+      border: 1px solid rgba(255, 215, 0, 0.4);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+    }
+
+    .today-pill span {
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .days-card,
+    .riddle-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.75), 0 0 15px rgba(255, 215, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .days-card::before,
+    .riddle-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top, rgba(255, 215, 0, 0.05), rgba(196, 30, 58, 0.02), transparent 55%);
+      pointer-events: none;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    .help-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .days-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .day-button {
+      position: relative;
+      border-radius: 14px;
+      padding: 10px 0 8px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 2px solid rgba(255, 215, 0, 0.4);
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.3), rgba(45, 95, 63, 0.3));
+      color: #f0f4f0;
+      cursor: pointer;
+      transition:
+        transform 0.08s ease-out,
+        box-shadow 0.08s ease-out,
+        border-color 0.12s ease-out,
+        background 0.12s ease-out;
+    }
+
+    .day-button::before {
+      content: "🎁";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 0.7rem;
+      opacity: 0;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .day-button span {
+      display: block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .day-button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      border: 1px solid transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease-out, border-color 0.15s ease-out;
+    }
+
+    .day-button:hover:not(.locked) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9), 0 0 15px rgba(255, 215, 0, 0.4);
+      border-color: rgba(255, 215, 0, 0.8);
+      background: linear-gradient(135deg, rgba(196, 30, 58, 0.5), rgba(45, 95, 63, 0.5));
+    }
+
+    .day-button:hover:not(.locked)::before {
+      opacity: 1;
+    }
+
+    .day-button.active {
+      border-color: rgba(255, 215, 0, 0.9);
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(196, 30, 58, 0.3), rgba(45, 95, 63, 0.3));
+      box-shadow: 0 12px 24px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    .day-button.active::after {
+      opacity: 1;
+      border-color: rgba(255, 215, 0, 0.7);
+    }
+
+    .day-button.active::before {
+      opacity: 1;
+      animation: bounce 0.5s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .day-button.locked {
+      cursor: not-allowed;
+      color: rgba(148, 163, 184, 0.7);
+      border-style: dashed;
+      border-color: rgba(75, 85, 99, 0.7);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.6), rgba(15,23,42,0.96));
+    }
+
+    .day-button.locked span {
+      color: rgba(107, 114, 128, 0.8);
+    }
+
+    .day-button.past:not(.active) {
+      opacity: 0.9;
+    }
+
+    .riddle-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .riddle-day-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .riddle-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+
+    .riddle-body {
+      font-size: 0.98rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-top: 6px;
+      white-space: pre-line;
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .note strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .warning {
+      color: var(--danger);
+    }
+
+    .foot {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <main class="app">
+    <header>
+      <div>
+        <h1>Calendrier de l'Avent – Devinettes</h1>
+        <p class="subtitle">
+          Un indice par jour pour trouver le secret de l'avent.
+        </p>
+      </div>
+      <div class="today-pill" id="today-pill">
+        <span>Jour&nbsp;?</span>
+        <span id="today-label"></span>
+      </div>
+    </header>
+
+    <section class="layout">
+      <section class="days-card">
+        <div class="card-title">Cases</div>
+        <div class="days-grid" id="days-grid">
+          <!-- Boutons générés en JS -->
+        </div>
+      </section>
+
+      <section class="riddle-card">
+        <div class="riddle-header">
+          <div>
+            <div class="riddle-day-label" id="riddle-day-label">
+              Choisis une case disponible
+            </div>
+            <div class="riddle-title" id="riddle-title">
+              Aucune devinette sélectionnée
+            </div>
+          </div>
+        </div>
+        <div class="riddle-body" id="riddle-body">
+          Clique sur un numéro de jour pour révéler sa devinette.
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    // ==========================
+    //   CONFIG : DEVINETTES
+    // ==========================
+    // Série 1 : Jean-Frédéric Oberlin (jours 1-7)
+    // Série 2 : Ellen Hayes (jours 8-13)
+    const riddles = {
+      1: `Je nais dans une France encore gouvernée par un Bourbon, l’année même où, un 20 octobre, la mort d’un empereur de Vienne sans fils fait voler en éclats les promesses de paix et embrase l’Europe autour d’une couronne contestée ; je meurs dans une autre France, restaurée sous un roi sacré à Reims, tandis qu’à Paris on érige un nouveau temple aux échanges financiers, que les premiers bateaux à vapeur remontent la Seine vers les jardins de Saint-Cloud et qu’un petit journal satirique au nom de barbier commence à se glisser entre les mains des lecteurs.`,
+
+      2: `Je viens d'une ville où l'on trouve un palais bien réel, posé au bord d’une rivière et adossé à une cathédrale de grès rose qui fut, pendant deux siècles, le plus haut bâtiment du monde. Un palais dont le nom ferait croire qu’on y entend hennir les chevaux d’un peuple du Riddermark, sorti de l’imagination d’un professeur d’Oxford. Un palais décoré dans un style venu de Paris, qui envahit façades, rampes d’escaliers, boiseries et argenterie : un décor fait de coquilles et de rochers stylisés, en courbes et contre-courbes, né à l’ombre d’un palais épiscopal fastueux et si lié au règne d’un roi qu’on dira plus tard qu’il en est presque la signature ornementale.`,
+
+      3: `Je consacre ma vie à un vieux massif émoussé, vestige d’une chaîne hercynienne, dont les crêtes ventées portent des pâturages rases qu’on appelle là-haut des hautes chaumes ; sur ses pentes naissent deux rivières dont l’une ira saluer le Rhin tandis que l’autre finira par rejoindre le Rhône, et, au XIXᵉ siècle, quand une frontière tracée après une défaite humiliante vient le couper en deux, sa silhouette bleuâtre à l’horizon devient dans les discours le symbole silencieux d’une patrie amputée.`,
+
+      4: `Mon terrain d'action n'est ni une grande ville ni une vallée prospère, mais un bout du monde accroché aux pentes : quelques hameaux pauvres, isolés, routes à peine tracées, habitants parlant un patois lorrain, sol maigre, climat rude. Dans ce patelin de montagne que d'autres auraient fui, que je décide de rester toute ma vie, on y trouve encore aujourd'hui un musée à ma mémoire.`,
+
+      5: `Dans ce coin perdu, on me connaît d'abord comme celui qui prêche dans le temple le dimanche ; mais la semaine, je deviens aussi ingénieur de chemins, conseiller agricole, visiteur des malades, organisateur d'entraide et défenseur des droits de chacun : un pasteur qui fait autant pour les corps que pour les âmes.`,
+
+      6: `Je ne supporte pas de voir les tout-petits livrés à eux-mêmes pendant que les adultes travaillent ; j'ouvre des pièces chauffées où une femme du village les accueille, leur apprend à prier, chanter, regarder des images, nommer les choses, tricoter sans se quereller : ces salles qu'on surnomme "poêles à tricoter" deviendront un modèle pour ce qu'on appellera plus tard l'école maternelle.`,
+
+      7: `Bien plus tard, un collège lointain, de l'autre côté de l'Atlantique, portera mon nom en hommage à cet idéal d'éducation et de solidarité né dans un coin reculé des Vosges. Qui suis-je ?`,
+
+      8: `J'ai vu le temps où les nouvelles voyageaient en diligence et par télégraphe.
+Quand je vieillis, les voix se mettent à glisser sur de grandes, moyennes et petites vagues invisibles, que l'œil ignore mais que l'oreille reconnaît.
+J'appartiens à ce monde-là, né avant ces vagues muettes, morte alors qu'elles enveloppaient déjà la planète.`,
+
+      9: `Je faisais mes calculs à la main, sur du papier couvert de symboles et de ratures ; quand j'ai fermé les yeux, nul écran n'éclairait encore les nuits, et les machines capables de raisonner en binaire n'étaient encore qu'un rêve de romancier.`,
+
+      10: `Je n'avais que faire des robes encombrantes et des dentelles approuvées par la bienséance : j'entrais en classe dans des jupes courtes et pratiques, faites pour grimper aux escaliers, tracer des formules et bousculer les idées, bien plus que pour rassurer les gardiens du bon goût.`,
+
+      11: `Dans un État où les bulletins ne portent encore que des noms d'hommes, je me présente, moi, vieille professeure aux idées rouges, à un poste fédéral qu'aucune femme n'avait jamais visé, et même en perdant l'élection, j'arrache plus de voix que tous les autres candidats de mon parti, jusqu'à dépasser largement celui qui briguait le siège de gouverneur.`,
+
+      12: `À un âge où beaucoup se retirent près du feu, moi, à soixante-seize ans, je descends encore dans la rue pour marcher contre la mise à mort de deux hommes venus d'ailleurs, et je termine la journée non pas à corriger des copies, mais à faire l'expérience des barreaux pour avoir trop hautement protesté.`,
+
+      13: `Dans la suite 1, 1, 2, 3, 5, … où chaque terme naît de la somme de ses deux aînés, cherche la plus grande de ces étoiles restée première avant d'atteindre 100, puis multiplie-la par le plus petit nombre premier qui refuse d'être pair : le produit te donnera le numéro du petit astre dont j'ai aidé à tracer la course.`,
+
+      14: "À compléter (jour 14).",
+      15: "À compléter (jour 15).",
+      16: "À compléter (jour 16).",
+      17: "À compléter (jour 17).",
+      18: "À compléter (jour 18).",
+      19: "À compléter (jour 19).",
+      20: "À compléter (jour 20).",
+      21: "À compléter (jour 21).",
+      22: "À compléter (jour 22).",
+      23: "À compléter (jour 23).",
+      24: "À compléter (jour 24)."
+    };
+
+    // ==========================
+    //   LOGIQUE CALENDRIER
+    // ==========================
+
+    const daysGrid = document.getElementById("days-grid");
+    const riddleDayLabel = document.getElementById("riddle-day-label");
+    const riddleTitle = document.getElementById("riddle-title");
+    const riddleBody = document.getElementById("riddle-body");
+    const todayLabel = document.getElementById("today-label");
+    const todayPill = document.getElementById("today-pill");
+    const lockNote = document.getElementById("lock-note");
+
+    const today = new Date();
+    const month = today.getMonth(); // 0 = janvier, 11 = décembre
+    const date = today.getDate();
+
+    // On ne débloque que jusqu'au jour courant en décembre.
+    // Si on n'est pas en décembre, on débloque juste le jour 1 (mode test).
+    const isDecember = month === 11;
+    const maxOpenDay = isDecember ? Math.min(date, 24) : 1;
+
+    if (isDecember) {
+      todayLabel.textContent = `Décembre – Jour ${Math.min(date, 24)}`;
+    } else {
+      todayLabel.textContent = "Hors décembre (mode test : seule la case 1 est ouverte)";
+      todayPill.classList.add("warning");
+    }
+
+    let currentDay = null;
+
+    function createDayButtons() {
+      for (let day = 1; day <= 24; day++) {
+        const btn = document.createElement("button");
+        btn.className = "day-button";
+        btn.dataset.day = String(day);
+        btn.innerHTML = `<div>${day}</div><span>Déc.</span>`;
+
+        if (day > maxOpenDay) {
+          btn.classList.add("locked");
+        } else if (day < maxOpenDay) {
+          btn.classList.add("past");
+        }
+
+        btn.addEventListener("click", () => onDayClick(day, btn));
+        daysGrid.appendChild(btn);
+      }
+    }
+
+    function onDayClick(day, btn) {
+      if (day > maxOpenDay) {
+        // futur : verrouillé
+        riddleDayLabel.textContent = "Patience…";
+        riddleTitle.textContent = "Cette case est encore fermée";
+        riddleBody.textContent =
+          "Reviens le bon jour pour découvrir la devinette cachée derrière ce numéro.";
+        return;
+      }
+
+      // Mise à jour visuelle des boutons
+      document.querySelectorAll(".day-button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      currentDay = day;
+      showRiddle(day);
+    }
+
+    function showRiddle(day) {
+      const text = riddles[day] || "Aucune devinette définie pour ce jour.";
+      riddleDayLabel.textContent = `Jour ${day}`;
+      riddleTitle.textContent = "Devinette du jour";
+      riddleBody.textContent = text;
+
+      if (day === maxOpenDay && isDecember) {
+        lockNote.innerHTML = "<span>✨</span><span><strong>C'est la devinette du jour&nbsp;!</strong> Les cases suivantes s'ouvriront au fil du mois.</span>";
+      } else {
+        lockNote.innerHTML = "<span>🔒</span><span><strong>Les cases à venir</strong> se déverrouilleront automatiquement le bon jour selon la date de ton appareil.</span>";
+      }
+    }
+
+    // Initialisation
+    createDayButtons();
+
+    // Option : pré-sélectionner automatiquement la case du jour (si ouverte)
+    const autoDay = maxOpenDay;
+    const autoBtn = daysGrid.querySelector(`.day-button[data-day="${autoDay}"]`);
+    if (autoBtn && !autoBtn.classList.contains("locked")) {
+      autoBtn.classList.add("active");
+      showRiddle(autoDay);
+    }
+  </script>
+</body>
+</html>
